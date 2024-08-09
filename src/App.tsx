@@ -1,5 +1,7 @@
+import "@styles/globals.css";
+
 function App() {
-  return <div>1</div>;
+  return <h1 className="font-bold underline text-3xl">Hello world!</h1>;
 }
 
 export default App;
