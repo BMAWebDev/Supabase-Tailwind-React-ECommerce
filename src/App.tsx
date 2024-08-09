@@ -1,7 +1,8 @@
+import Router from "./router";
 import "@styles/globals.css";
 
 function App() {
-  return <h1 className="font-bold underline text-3xl">Hello world!</h1>;
+  return Router;
 }
 
 export default App;
