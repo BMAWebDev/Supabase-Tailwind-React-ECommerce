@@ -24,6 +24,7 @@
     "paths": {
       "@styles/*": ["./styles/*"],
       "@views/*": ["./views/*"],
+      "@lib/*": ["./lib/*"],
     }
   },
   "include": ["src"]
