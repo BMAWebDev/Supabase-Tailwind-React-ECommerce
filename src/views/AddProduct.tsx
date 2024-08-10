@@ -8,9 +8,11 @@ interface AddProductData {
   product_description?: string;
 }
 
+const KEY = `sb-${import.meta.env.VITE_ENV_SUPABASE_PROJECT_ID}-auth-token`;
+
 const AddProduct = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
-    JSON.parse(sessionStorage.getItem("loggedIn") || "false")
+    JSON.parse(sessionStorage.getItem(KEY) || "false")
   );
 
   const [name, setName] = useState("");
@@ -27,19 +29,32 @@ const AddProduct = () => {
       .insert({ product_name, product_stock_qty, product_price, product_description });
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (password !== import.meta.env.VITE_ENV_APP_AUTH_PASS) {
       alert("wrong pass!");
+      setPassword("");
+      return;
+    }
+
+    const { error } = await db.auth.signInWithPassword({
+      email: "dev@bmawebdev.ro",
+      password,
+    });
+
+    if (error) {
+      alert("Something went wrong. Please try again!");
+      setPassword("");
       return;
     }
 
     setIsLoggedIn(true);
-    sessionStorage.setItem("loggedIn", "true");
   };
 
   return (
     <div className="w-full m-auto flex h-screen justify-center items-center max-w-lg">
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex-1">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex-1">
         {!isLoggedIn ? (
           <div className="mb-6">
             <label className="flex text-gray-700 text-sm font-bold mb-2 gap-1" htmlFor="password">
@@ -50,8 +65,10 @@ const AddProduct = () => {
               className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               type="password"
+              value={password}
               placeholder="******************"
               onChange={(e) => setPassword(e.target.value)}
+              onKeyUp={(e) => e.key === "Enter" && handleLogin()}
             />
           </div>
         ) : (
