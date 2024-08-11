@@ -9,7 +9,10 @@ export const getIsLoggedIn = async () => {
 
   if (Object.keys(authObj).length === 0) return false;
 
-  const user = await db.auth.getUser(authObj.access_token);
-
-  return user.data.user?.id === authObj.user.id;
+  try {
+    const user = await db.auth.getUser(authObj.access_token);
+    return user.data.user?.id === authObj.user.id;
+  } catch (error: any) {
+    throw new Error(error);
+  }
 };
