@@ -1,60 +1,60 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// models
+import { IProductDB } from '@models/db';
 // utils
+import db from '@lib/db';
 import { getIsLoggedIn } from '@utils/auth';
 // components
 import DefaultProductThumbnail from '@assets/product-thumbnail-empty.jpeg';
 import DeleteIcon from '@assets/icons/delete.svg';
 
 const Products = () => {
-  const products = [
-    {
-      id: 1,
-      product_title: 'name 1',
-      product_description: 'halo',
-      product_price: 100,
-      product_stock_qty: 150,
-      product_thumbnail_url:
-        'https://media.istockphoto.com/id/471928894/ro/fotografie/p%C4%83un.jpg?s=1024x1024&w=is&k=20&c=tzlg7igAOUq8A6F-u4VabwKmJBSzDhWqtsvuWfbMYyY=',
-    },
-    {
-      id: 2,
-      product_title: 'name 2',
-      product_description: 'halo',
-      product_price: 100,
-      product_stock_qty: 150,
-    },
-    {
-      id: 3,
-      product_title: 'name 3',
-      product_description: 'halo',
-      product_price: 100,
-      product_stock_qty: 150,
-      product_thumbnail_url:
-        'https://media.istockphoto.com/id/490576879/ro/fotografie/texas-exotice.jpg?s=1024x1024&w=is&k=20&c=DRgbkd-CC0d6ktKvoEGe-PtUJCO73tbJ1zFqvMYKUII=',
-    },
-    {
-      id: 4,
-      product_title: 'name 4',
-      product_description: 'halo',
-      product_price: 100,
-      product_stock_qty: 150,
-    },
-  ];
-
-  const [prods, setProds] = useState(products);
-
+  const navigate = useNavigate();
+  const [products, setProducts] = useState<IProductDB[]>([]);
   const isLoggedIn = getIsLoggedIn();
 
-  const deleteProduct = (productID: number) => {
-    const indexToDelete = prods.map((product) => product.id).indexOf(productID);
+  useEffect(() => {
+    if (products.length === 0) {
+      getProducts()
+        .then((res) => {
+          setProducts(res);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [products]);
 
-    setProds((prev) => {
-      const newProds = JSON.parse(JSON.stringify(prev));
-      newProds.splice(indexToDelete, 1);
+  const getProducts = async (): Promise<IProductDB[]> => {
+    const { data, error } = await db.from('products').select('*');
 
-      return newProds;
-    });
+    if (error) throw new Error(error.message);
+
+    return data;
+  };
+
+  const deleteProduct = async (productID: number) => {
+    const isDeleteConfirmed = confirm(
+      `Are you sure you want to delete product ${
+        products.find((prod) => prod.product_id === productID)?.product_name ||
+        `product with ID ${productID}`
+      }`,
+    );
+
+    if (isDeleteConfirmed) {
+      const { error } = await db
+        .from('products')
+        .delete()
+        .eq('product_id', productID);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setTimeout(() => {
+        navigate(0);
+      }, 10000);
+    }
   };
 
   return (
@@ -64,11 +64,11 @@ const Products = () => {
           Products list
         </h2>
 
-        <div className="flex justify-center gap-4 max-sm:flex-col">
-          {prods.map((product) => (
+        <div className="grid grid-cols-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 gap-4">
+          {products.map((product) => (
             <Link
-              to={`/product/${product.id}`}
-              key={product.id}
+              to={`/product/${product.product_id}`}
+              key={product.product_id}
               className="product m-0 group cursor-pointer bg-white transition-all duration-500 basis-1/2"
             >
               <div className="relative">
@@ -83,7 +83,7 @@ const Products = () => {
                     className="delete-container absolute top-0 right-0 bg-slate-200 rounded-2xl p-2"
                     onClick={(e) => {
                       e.preventDefault();
-                      deleteProduct(product.id);
+                      deleteProduct(product.product_id);
                     }}
                   >
                     <img
@@ -99,7 +99,7 @@ const Products = () => {
               <div className="mt-5">
                 <div className="flex items-center justify-between">
                   <h6 className="font-semibold text-xl leading-8 text-black transition-all duration-500 group-hover:text-indigo-600">
-                    {product.product_title}
+                    {product.product_name}
                   </h6>
                   <h6 className="font-semibold text-xl leading-8 text-indigo-600">
                     ${product.product_price}

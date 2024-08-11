@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { redirect } from 'react-router-dom';
+// models
+import { IProductDB } from '@models/db';
 // services
 import db from '@lib/db';
 // utils
@@ -7,12 +10,7 @@ import { getIsLoggedIn } from 'utils/auth';
 import LeftArrow from '@assets/icons/left-arrow.svg';
 import { Link } from 'react-router-dom';
 
-interface AddProductData {
-  product_name: string;
-  product_stock_qty: number;
-  product_price: number;
-  product_description?: string;
-}
+type AddProductData = Omit<IProductDB, 'product_id'>;
 
 const AddProduct = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(getIsLoggedIn());
@@ -22,22 +20,16 @@ const AddProduct = () => {
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
-  const [thumbnailURL, setThumbnailURL] = useState('');
+  const [_, setThumbnailURL] = useState('');
 
   const addProduct = async (data: AddProductData) => {
-    const {
-      product_name,
-      product_price,
-      product_stock_qty,
-      product_description,
-    } = data;
-
     await db.from('products').insert({
-      product_name,
-      product_stock_qty,
-      product_price,
-      product_description,
+      ...data,
     });
+
+    alert('Product successfully added.');
+
+    redirect('/');
   };
 
   const handleLogin = async () => {

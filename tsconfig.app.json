@@ -27,6 +27,7 @@
       "@lib/*": ["./lib/*"],
       "@assets/*": ["./assets/*"],
       "@utils/*": ["./utils/*"],
+      "@models/*": ["./models/*"],
     }
   },
   "include": ["src"]
