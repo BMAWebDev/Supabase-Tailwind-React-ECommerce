@@ -1,6 +1,15 @@
-export const getIsLoggedIn = () =>
-  JSON.parse(
+import db from '@lib/db';
+
+export const getIsLoggedIn = async () => {
+  const authObj = JSON.parse(
     sessionStorage.getItem(
       `sb-${import.meta.env.VITE_ENV_SUPABASE_PROJECT_ID}-auth-token`,
-    ) || 'false',
+    ) || '{}',
   );
+
+  if (Object.keys(authObj).length === 0) return false;
+
+  const user = await db.auth.getUser(authObj.access_token);
+
+  return user.data.user?.id === authObj.user.id;
+};

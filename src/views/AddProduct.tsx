@@ -1,26 +1,25 @@
-import { useState } from 'react';
-import { redirect } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { redirect, Link } from 'react-router-dom';
 // models
 import { IProductDB } from '@models/db';
 // services
 import db from '@lib/db';
 // utils
-import { getIsLoggedIn } from 'utils/auth';
+import { getIsLoggedIn } from '@utils/auth';
 // components
 import LeftArrow from '@assets/icons/left-arrow.svg';
-import { Link } from 'react-router-dom';
 
 type AddProductData = Omit<IProductDB, 'product_id'>;
 
 const AddProduct = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(getIsLoggedIn());
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const [name, setName] = useState('');
   const [stockQty, setStockQty] = useState(0);
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
-  const [_, setThumbnailURL] = useState('');
+  const [, setThumbnailURL] = useState('');
 
   const addProduct = async (data: AddProductData) => {
     await db.from('products').insert({
@@ -52,6 +51,14 @@ const AddProduct = () => {
 
     setIsLoggedIn(true);
   };
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      getIsLoggedIn().then((res) => {
+        setIsLoggedIn(res);
+      });
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="w-full m-auto flex h-screen justify-center items-center max-w-md flex-col gap-4">

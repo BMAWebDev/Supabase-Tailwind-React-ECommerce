@@ -13,7 +13,7 @@ import DeleteIcon from '@assets/icons/delete.svg';
 const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<IProductDB[]>([]);
-  const isLoggedIn = getIsLoggedIn();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
     if (products.length === 0) {
@@ -24,6 +24,14 @@ const Products = () => {
         .catch((err) => console.log(err));
     }
   }, [products]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      getIsLoggedIn().then((res) => {
+        setIsLoggedIn(res);
+      });
+    }
+  }, [isLoggedIn]);
 
   const getProducts = async (): Promise<IProductDB[]> => {
     const { data, error } = await db.from('products').select('*');
@@ -60,8 +68,11 @@ const Products = () => {
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="font-manrope font-bold text-4xl text-black mb-8 max-sm:text-center">
+        <h2 className="font-manrope font-bold text-4xl text-black mb-8 max-sm:text-center flex justify-between w-full">
           Products list
+          <Link to="/add-product" className="text-blue-700">
+            Add product
+          </Link>
         </h2>
 
         <div className="grid grid-cols-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 gap-4">
