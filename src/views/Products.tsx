@@ -65,15 +65,39 @@ const Products = () => {
     }
   };
 
+  const logOut = async () => {
+    const { error } = await db.auth.signOut();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    navigate(0);
+  };
+
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="font-manrope font-bold text-4xl text-black mb-8 max-sm:text-center flex justify-between w-full">
-          Products list
-          <Link to="/add-product" className="text-blue-700">
-            Add product
-          </Link>
-        </h2>
+        <div className="flex justify-between w-full">
+          <h2 className="font-manrope font-bold text-4xl text-black mb-8 max-sm:text-center">
+            Products list
+          </h2>
+
+          <div className="flex gap-10">
+            <Link to="/add-product" className="text-blue-700">
+              Add product
+            </Link>
+
+            {isLoggedIn && (
+              <span
+                onClick={() => logOut()}
+                className="text-black cursor-pointer"
+              >
+                Logout
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 gap-4">
           {products.map((product) => (
@@ -86,7 +110,7 @@ const Products = () => {
                 <img
                   src={product.product_thumbnail_url || DefaultProductThumbnail}
                   alt="product thumbnail"
-                  className="w-full aspect-square rounded-2xl"
+                  className="w-full aspect-square rounded-2xl object-cover"
                 />
 
                 {isLoggedIn && (
@@ -116,7 +140,7 @@ const Products = () => {
                     ${product.product_price}
                   </h6>
                 </div>
-                <p className="mt-2 font-normal text-sm leading-6 text-gray-500">
+                <p className="mt-2 font-normal text-sm leading-6 text-gray-500 truncate">
                   {product.product_description}
                 </p>
               </div>

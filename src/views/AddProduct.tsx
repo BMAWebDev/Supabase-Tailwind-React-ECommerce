@@ -19,7 +19,7 @@ const AddProduct = () => {
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
-  const [, setThumbnailURL] = useState('');
+  const [thumbnailURL, setThumbnailURL] = useState('');
 
   const addProduct = async (data: AddProductData) => {
     await db.from('products').insert({
@@ -192,6 +192,7 @@ const AddProduct = () => {
                   product_price: price,
                   product_stock_qty: stockQty,
                   product_description: description,
+                  product_thumbnail_url: thumbnailURL,
                 })
               : handleLogin()
           }
