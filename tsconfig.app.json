@@ -11,7 +11,7 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": true, 
     "jsx": "react-jsx",
 
     /* Linting */
@@ -25,6 +25,8 @@
       "@styles/*": ["./styles/*"],
       "@views/*": ["./views/*"],
       "@lib/*": ["./lib/*"],
+      "@assets/*": ["./assets/*"],
+      "@utils/*": ["./utils/*"],
     }
   },
   "include": ["src"]
